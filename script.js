@@ -20,9 +20,9 @@ window.addEventListener('scroll', () => {
     const currentScroll = window.pageYOffset;
     
     if (currentScroll > 50) {
-        navbar.style.background = 'rgba(15, 23, 42, 0.95)';
+        navbar.style.background = 'rgba(248, 249, 250, 0.95)';
     } else {
-        navbar.style.background = 'rgba(15, 23, 42, 0.8)';
+        navbar.style.background = 'rgba(248, 249, 250, 0.9)';
     }
     
     lastScroll = currentScroll;
@@ -55,9 +55,9 @@ document.addEventListener('mousemove', (e) => {
     const y = e.clientY / window.innerHeight;
     
     gradientBg.style.background = `
-        radial-gradient(ellipse at ${20 + x * 10}% ${20 + y * 10}%, rgba(113, 113, 122, 0.08) 0%, transparent 50%),
-        radial-gradient(ellipse at ${80 - x * 10}% ${80 - y * 10}%, rgba(161, 161, 170, 0.08) 0%, transparent 50%),
-        radial-gradient(ellipse at ${40 + x * 20}% ${60 - y * 20}%, rgba(82, 82, 91, 0.06) 0%, transparent 50%)
+        radial-gradient(ellipse at ${20 + x * 10}% ${20 + y * 10}%, rgba(91, 138, 114, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at ${80 - x * 10}% ${80 - y * 10}%, rgba(212, 165, 116, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at ${40 + x * 20}% ${60 - y * 20}%, rgba(124, 152, 133, 0.04) 0%, transparent 50%)
     `;
 });
 
