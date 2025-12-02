@@ -4,6 +4,7 @@ FROM nginx:alpine
 COPY index.html /usr/share/nginx/html/
 COPY styles.css /usr/share/nginx/html/
 COPY script.js /usr/share/nginx/html/
+COPY favicon.svg /usr/share/nginx/html/
 COPY PXL_20231104_143129602~2.jpg /usr/share/nginx/html/
 
 # Expose port 80
