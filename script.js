@@ -1,328 +1,224 @@
-// ===== Theme Toggle =====
-const themeToggle = document.getElementById('themeToggle');
-const html = document.documentElement;
+document.addEventListener('DOMContentLoaded', function() {
+    initTheme();
+    initMobileMenu();
+    initTypingEffect();
+    initScrollReveal();
+    initCounters();
+    initCursorGlow();
+    initContactFab();
+    initMarquee();
+});
 
-// Check for saved theme preference or default to dark
-const savedTheme = localStorage.getItem('theme') || 'dark';
-html.setAttribute('data-theme', savedTheme);
-
-themeToggle.addEventListener('click', () => {
-    const currentTheme = html.getAttribute('data-theme');
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+function initTheme() {
+    const toggle = document.querySelector('.theme-toggle');
+    const mobileToggle = document.querySelector('.mobile-theme-toggle');
+    const stored = localStorage.getItem('theme');
     
-    html.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
-});
-
-// ===== Mobile Menu =====
-const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-const mobileMenu = document.getElementById('mobileMenu');
-
-mobileMenuBtn.addEventListener('click', () => {
-    mobileMenuBtn.classList.toggle('active');
-    mobileMenu.classList.toggle('active');
-});
-
-// Close mobile menu when clicking a link
-mobileMenu.querySelectorAll('a').forEach(link => {
-    link.addEventListener('click', () => {
-        mobileMenuBtn.classList.remove('active');
-        mobileMenu.classList.remove('active');
-    });
-});
-
-// ===== Smooth Scroll =====
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-    });
-});
-
-// ===== Navbar Background on Scroll =====
-const navbar = document.querySelector('.navbar');
-let lastScroll = 0;
-
-window.addEventListener('scroll', () => {
-    const currentScroll = window.pageYOffset;
-    
-    if (currentScroll > 50) {
-        navbar.style.boxShadow = 'var(--shadow-sm)';
-    } else {
-        navbar.style.boxShadow = 'none';
+    if (stored) {
+        document.documentElement.setAttribute('data-theme', stored);
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.setAttribute('data-theme', 'dark');
     }
     
-    lastScroll = currentScroll;
-});
-
-// ===== Typing Effect =====
-const typedTextElement = document.getElementById('typedText');
-const phrases = [
-    'blockchain solutions',
-    'AI-powered apps',
-    'full-stack systems',
-    'creative solutions',
-    'enterprise software'
-];
-
-let phraseIndex = 0;
-let charIndex = 0;
-let isDeleting = false;
-let typingSpeed = 100;
-
-function typeText() {
-    const currentPhrase = phrases[phraseIndex];
-    
-    if (isDeleting) {
-        typedTextElement.textContent = currentPhrase.substring(0, charIndex - 1);
-        charIndex--;
-        typingSpeed = 50;
-    } else {
-        typedTextElement.textContent = currentPhrase.substring(0, charIndex + 1);
-        charIndex++;
-        typingSpeed = 100;
+    function switchTheme() {
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
     }
     
-    if (!isDeleting && charIndex === currentPhrase.length) {
-        isDeleting = true;
-        typingSpeed = 2000; // Pause at end
-    } else if (isDeleting && charIndex === 0) {
-        isDeleting = false;
-        phraseIndex = (phraseIndex + 1) % phrases.length;
-        typingSpeed = 500; // Pause before next phrase
-    }
-    
-    setTimeout(typeText, typingSpeed);
+    toggle?.addEventListener('click', switchTheme);
+    mobileToggle?.addEventListener('click', switchTheme);
 }
 
-// Start typing effect
-setTimeout(typeText, 1000);
-
-// ===== Animated Counters =====
-const counters = document.querySelectorAll('.stat-number');
-let countersAnimated = false;
-
-function animateCounters() {
-    counters.forEach(counter => {
-        const target = parseInt(counter.getAttribute('data-count'));
-        const duration = 2000;
-        const step = target / (duration / 16);
-        let current = 0;
-        
-        const updateCounter = () => {
-            current += step;
-            if (current < target) {
-                counter.textContent = Math.floor(current);
-                requestAnimationFrame(updateCounter);
-            } else {
-                counter.textContent = target;
-            }
-        };
-        
-        updateCounter();
-    });
-}
-
-// ===== Intersection Observer for Animations =====
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-};
-
-const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('active');
-            
-            // Trigger counter animation when stats section is visible
-            if (entry.target.closest('.hero') && !countersAnimated) {
-                countersAnimated = true;
-                animateCounters();
-            }
-        }
-    });
-}, observerOptions);
-
-// Observe all sections and cards
-document.querySelectorAll('.section, .project-card, .skill-category, .experience-card').forEach(el => {
-    el.classList.add('reveal');
-    revealObserver.observe(el);
-});
-
-// Animate hero stats
-const heroSection = document.querySelector('.hero');
-if (heroSection) {
-    revealObserver.observe(heroSection);
-}
-
-// ===== Cursor Glow Effect =====
-const cursorGlow = document.querySelector('.cursor-glow');
-
-document.addEventListener('mousemove', (e) => {
-    cursorGlow.style.left = e.clientX + 'px';
-    cursorGlow.style.top = e.clientY + 'px';
-});
-
-// ===== Active Navigation Link =====
-const sections = document.querySelectorAll('.section');
-const navLinks = document.querySelectorAll('.nav-links a');
-
-window.addEventListener('scroll', () => {
-    let current = '';
+function initMobileMenu() {
+    const btn = document.querySelector('.mobile-menu-btn');
+    const menu = document.querySelector('.mobile-menu');
     
-    sections.forEach(section => {
-        const sectionTop = section.offsetTop;
-        const sectionHeight = section.clientHeight;
-        
-        if (pageYOffset >= sectionTop - 200) {
-            current = section.getAttribute('id');
-        }
+    btn?.addEventListener('click', function() {
+        btn.classList.toggle('active');
+        menu.classList.toggle('active');
     });
     
-    navLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href') === `#${current}`) {
-            link.classList.add('active');
-        }
-    });
-});
-
-// ===== Project Card Hover Effect =====
-document.querySelectorAll('.project-card').forEach(card => {
-    card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        
-        card.style.setProperty('--mouse-x', `${x}px`);
-        card.style.setProperty('--mouse-y', `${y}px`);
-    });
-});
-
-// ===== Skill Tags Animation =====
-document.querySelectorAll('.skill-tag').forEach((tag, index) => {
-    tag.style.animationDelay = `${index * 0.05}s`;
-});
-
-// ===== Console Easter Egg =====
-console.log(`
-%c╔═══════════════════════════════════════╗
-║                                       ║
-║   👋 Hey there, curious developer!    ║
-║                                       ║
-║   Thanks for checking out my code.    ║
-║   Feel free to reach out!             ║
-║                                       ║
-║   📧 dobey.christopher@gmail.com      ║
-║   🔗 github.com/cdobey                ║
-║                                       ║
-╚═══════════════════════════════════════╝
-`, 'color: #6366f1; font-family: monospace; font-size: 12px;');
-
-// ===== Parallax Effect for Hero =====
-window.addEventListener('scroll', () => {
-    const scrolled = window.pageYOffset;
-    const heroContent = document.querySelector('.hero-content');
-    const heroVisual = document.querySelector('.hero-visual');
-    
-    if (heroContent && scrolled < window.innerHeight) {
-        heroContent.style.transform = `translateY(${scrolled * 0.3}px)`;
-        heroContent.style.opacity = 1 - (scrolled / (window.innerHeight * 0.8));
-    }
-    
-    if (heroVisual && scrolled < window.innerHeight) {
-        heroVisual.style.transform = `translateY(calc(-50% + ${scrolled * 0.15}px))`;
-    }
-});
-
-// ===== Preload Images =====
-function preloadImages() {
-    const images = document.querySelectorAll('img[loading="lazy"]');
-    
-    if ('IntersectionObserver' in window) {
-        const imageObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const img = entry.target;
-                    img.src = img.dataset.src || img.src;
-                    img.classList.add('loaded');
-                    imageObserver.unobserve(img);
-                }
-            });
+    document.querySelectorAll('.mobile-menu a').forEach(link => {
+        link.addEventListener('click', function() {
+            btn.classList.remove('active');
+            menu.classList.remove('active');
         });
-        
-        images.forEach(img => imageObserver.observe(img));
-    }
-}
-
-preloadImages();
-
-// ===== Form Validation (if contact form exists) =====
-const contactForm = document.querySelector('.contact-form');
-if (contactForm) {
-    contactForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        // Add form handling logic here
     });
 }
 
-// ===== Keyboard Navigation =====
-document.addEventListener('keydown', (e) => {
-    // Press 'T' to toggle theme
-    if (e.key === 't' && !e.ctrlKey && !e.metaKey && !e.altKey) {
-        const activeElement = document.activeElement;
-        const isInput = activeElement.tagName === 'INPUT' || 
-                       activeElement.tagName === 'TEXTAREA' ||
-                       activeElement.isContentEditable;
+function initTypingEffect() {
+    const element = document.querySelector('.typed-text');
+    if (!element) return;
+    
+    const words = ['enterprise solutions', 'blockchain systems', 'distributed apps', 'clean interfaces'];
+    let wordIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+    
+    function type() {
+        const current = words[wordIndex];
         
-        if (!isInput) {
-            themeToggle.click();
+        if (isDeleting) {
+            element.textContent = current.substring(0, charIndex - 1);
+            charIndex--;
+        } else {
+            element.textContent = current.substring(0, charIndex + 1);
+            charIndex++;
+        }
+        
+        let delay = isDeleting ? 50 : 100;
+        
+        if (!isDeleting && charIndex === current.length) {
+            delay = 2000;
+            isDeleting = true;
+        } else if (isDeleting && charIndex === 0) {
+            isDeleting = false;
+            wordIndex = (wordIndex + 1) % words.length;
+            delay = 500;
+        }
+        
+        setTimeout(type, delay);
+    }
+    
+    setTimeout(type, 1000);
+}
+
+function initScrollReveal() {
+    const reveals = document.querySelectorAll('.reveal');
+    
+    function checkReveal() {
+        reveals.forEach(el => {
+            const top = el.getBoundingClientRect().top;
+            const trigger = window.innerHeight * 0.85;
+            
+            if (top < trigger) {
+                el.classList.add('active');
+            }
+        });
+    }
+    
+    window.addEventListener('scroll', checkReveal);
+    checkReveal();
+}
+
+function initCounters() {
+    const counters = document.querySelectorAll('[data-count]');
+    let started = false;
+    
+    function animate(el) {
+        const target = parseInt(el.dataset.count);
+        const duration = 2000;
+        const start = performance.now();
+        
+        function update(now) {
+            const elapsed = now - start;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            
+            el.textContent = Math.round(target * eased);
+            
+            if (progress < 1) {
+                requestAnimationFrame(update);
+            }
+        }
+        
+        requestAnimationFrame(update);
+    }
+    
+    function check() {
+        if (started) return;
+        
+        counters.forEach(el => {
+            const top = el.getBoundingClientRect().top;
+            if (top < window.innerHeight * 0.8) {
+                started = true;
+                counters.forEach(animate);
+            }
+        });
+    }
+    
+    window.addEventListener('scroll', check);
+    check();
+}
+
+function initCursorGlow() {
+    const glow = document.querySelector('.cursor-glow');
+    if (!glow || window.innerWidth < 1024) return;
+    
+    let x = 0, y = 0;
+    let currentX = 0, currentY = 0;
+    
+    document.addEventListener('mousemove', e => {
+        x = e.clientX;
+        y = e.clientY;
+    });
+    
+    function render() {
+        currentX += (x - currentX) * 0.1;
+        currentY += (y - currentY) * 0.1;
+        glow.style.left = currentX + 'px';
+        glow.style.top = currentY + 'px';
+        requestAnimationFrame(render);
+    }
+    
+    render();
+}
+
+function initContactFab() {
+    const floatingBar = document.querySelector('.floating-bar');
+    const footer = document.querySelector('#footer');
+    const footerLinks = document.querySelectorAll('.footer-link-target');
+    
+    if (!floatingBar || !footer) return;
+    
+    let isVisible = false;
+    let hasMerged = false;
+    
+    function updateState() {
+        const scrollY = window.scrollY;
+        const heroHeight = document.querySelector('.hero')?.offsetHeight || 500;
+        const footerRect = footer.getBoundingClientRect();
+        const footerVisible = footerRect.top < window.innerHeight - 50;
+        
+        if (footerVisible) {
+            if (isVisible && !hasMerged) {
+                hasMerged = true;
+                floatingBar.classList.add('merging');
+                floatingBar.classList.remove('visible');
+                
+                footerLinks.forEach((link, i) => {
+                    setTimeout(() => {
+                        link.classList.add('highlight');
+                        setTimeout(() => link.classList.remove('highlight'), 400);
+                    }, i * 100);
+                });
+            }
+        } else {
+            hasMerged = false;
+            floatingBar.classList.remove('merging');
+            
+            if (scrollY > heroHeight * 0.5) {
+                if (!isVisible) {
+                    floatingBar.classList.add('visible');
+                    isVisible = true;
+                }
+            } else {
+                floatingBar.classList.remove('visible');
+                isVisible = false;
+            }
         }
     }
     
-    // Escape to close mobile menu
-    if (e.key === 'Escape') {
-        mobileMenuBtn.classList.remove('active');
-        mobileMenu.classList.remove('active');
-    }
-});
-
-// ===== Performance: Debounce Scroll Events =====
-function debounce(func, wait = 10) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
+    window.addEventListener('scroll', updateState);
+    updateState();
 }
 
-// ===== Initialize =====
-document.addEventListener('DOMContentLoaded', () => {
-    // Add loaded class to body for CSS animations
-    document.body.classList.add('loaded');
+function initMarquee() {
+    const content = document.querySelector('.marquee-content');
+    if (!content) return;
     
-    // Remove loading state
-    setTimeout(() => {
-        document.body.classList.add('ready');
-    }, 100);
-});
-
-// ===== Handle Reduced Motion Preference =====
-const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-
-if (prefersReducedMotion.matches) {
-    // Disable animations for users who prefer reduced motion
-    document.documentElement.style.setProperty('--transition-fast', '0s');
-    document.documentElement.style.setProperty('--transition-normal', '0s');
-    document.documentElement.style.setProperty('--transition-slow', '0s');
+    const clone = content.cloneNode(true);
+    content.parentNode.appendChild(clone);
 }
