@@ -1215,26 +1215,6 @@ body:hover .cursor-glow {
     height: 100%;
 }
 
-.project-image-placeholder {
-    width: 100%;
-    height: 100%;
-    background: var(--bg-tertiary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.project-emoji {
-    font-size: 4rem;
-    filter: grayscale(30%);
-    transition: all var(--transition-base);
-}
-
-.project-card:hover .project-emoji {
-    filter: grayscale(0%);
-    transform: scale(1.1);
-}
-
 .project-overlay {
     position: absolute;
     inset: 0;
