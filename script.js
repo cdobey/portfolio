@@ -156,6 +156,7 @@ function initCursorGlow() {
     });
     
     function render() {
+        if (!glow) return;
         currentX += (x - currentX) * 0.1;
         currentY += (y - currentY) * 0.1;
         glow.style.left = currentX + 'px';
