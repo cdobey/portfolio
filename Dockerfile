@@ -1,5 +1,8 @@
 FROM nginx:alpine
 
+# Copy custom nginx configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 # Copy website files to nginx html directory
 COPY index.html /usr/share/nginx/html/
 COPY styles.css /usr/share/nginx/html/
